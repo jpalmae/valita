@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Seguimiento de Pedido {{ order.order_number }} - Chocolates Patitas de Algodón{% endblock %}
+
+{% block content %}
+<nav class="bg-salmon-400 text-white border-b border-salmon-300 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/" class="text-2xl font-serif text-white tracking-widest">Chocolates Patitas de Algodón</a>
+            </div>
+            <div class="flex items-center text-salmon-300">
+                <a href="/" class="text-sm font-medium hover:text-white transition">Volver a la tienda</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+    <div class="bg-white shadow-lg sm:rounded-lg overflow-hidden border border-gray-100">
+        <div
+            class="px-4 py-5 border-b border-gray-100 sm:px-6 bg-salmon-50 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h3 class="text-lg leading-6 font-medium text-darkgray font-serif">Pedido <span
+                        class="font-sans font-bold">{{ order.order_number }}</span></h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500">Realizado el {{ order.created_at.strftime('%d de %B,
+                    %Y') }}</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flexspace-x-2">
+                {% if order.payment_status == 'approved' %}
+                <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+                    Pago Aprobado
+                </span>
+                {% elif order.payment_status == 'pending' %}
+                <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                    Pago Pendiente
+                </span>
+                {% else %}
+                <span
+                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
+                    Pago Error/Rechazado
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="px-4 py-8 sm:px-6 bg-white shrink">
+            <h4 class="text-lg font-serif font-medium text-darkgray mb-6 text-center">Estado del Pedido</h4>
+
+            <!-- Timeline -->
+            <div class="relative max-w-2xl mx-auto">
+                {% set statuses = [
+                ('recibido', 'Recibido', 'Pedido recibido y en revisión'),
+                ('confirmado', 'Confirmado', 'Pago confirmado, preparando orden'),
+                ('en_fabricacion', 'En Fabricación', 'Elaborando tus chocolates artesanalmente'),
+                ('listo_para_entrega', 'Listo para Entrega', 'Empaquetado y listo para ser enviado/entregado'),
+                ('entregado', 'Entregado', 'Entregado al cliente exitosamente')
+                ] %}
+
+                {% set status_index = 0 %}
+                {% if order.status.value == 'recibido' %}{% set status_index = 0 %}{% endif %}
+                {% if order.status.value == 'confirmado' %}{% set status_index = 1 %}{% endif %}
+                {% if order.status.value == 'en_fabricacion' %}{% set status_index = 2 %}{% endif %}
+                {% if order.status.value == 'listo_para_entrega' %}{% set status_index = 3 %}{% endif %}
+                {% if order.status.value == 'entregado' %}{% set status_index = 4 %}{% endif %}
+                {% if order.status.value == 'rechazado' or order.status.value == 'cancelado' %}
+                {% set cancelled = true %}
+                {% endif %}
+
+                {% if cancelled %}
+                <div class="text-center p-6 bg-red-50 rounded-lg border border-red-200">
+                    <svg class="mx-auto h-12 w-12 text-red-500 mb-2" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-bold text-red-800">Pedido {{ order.status.value | title }}</h3>
+                    <p class="text-sm text-red-600">Este pedido no pudo ser procesado o fue cancelado.</p>
+                </div>
+                {% else %}
+                <div class="overflow-hidden">
+                    <ul role="list" class="-mb-8">
+                        {% for id, title, desc in statuses %}
+                        <li>
+                            <div class="relative pb-8 -ml-8">
+                                {% if not loop.last %}
+                                <span
+                                    class="absolute top-4 left-12 -ml-px h-full w-0.5 {{ 'bg-salmon-400' if loop.index0 < status_index else 'bg-gray-200' }}"
+                                    aria-hidden="true"></span>
+                                {% endif %}
+                                <div class="relative flex space-x-3 left-8">
+                                    <div>
+                                        <span
+                                            class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white {{ 'bg-salmon-400' if loop.index0 <= status_index else 'bg-gray-200' }}">
+                                            {% if loop.index0 < status_index %} <svg class="w-5 h-5 text-white"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M5 13l4 4L19 7"></path></svg>
+                                                {% elif loop.index0 == status_index %}
+                                                <div class="h-3 w-3 rounded-full bg-white"></div>
+                                                {% else %}
+                                                <div class="h-2 w-2 rounded-full bg-white"></div>
+                                                {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                        <div>
+                                            <p
+                                                class="text-sm font-bold {{ 'text-darkgray' if loop.index0 <= status_index else 'text-gray-500' }}">
+                                                {{ title }}</p>
+                                            <p
+                                                class="text-sm {{ 'text-salmon-600' if loop.index0 <= status_index else 'text-gray-400' }}">
+                                                {{ desc }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6 bg-gray-50">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Enviar a</dt>
+                    <dd class="mt-1 text-sm text-gray-900 break-words font-medium">{{ order.customer_name }}</dd>
+                    <dd class="text-sm text-gray-600 break-words">{{ order.customer_address }}</dd>
+                </div>
+                <div class="sm:col-span-1">
+                    <dt class="text-sm font-medium text-gray-500">Contacto</dt>
+                    <dd class="mt-1 text-sm text-gray-900 break-words">{{ order.customer_email }}</dd>
+                    <dd class="text-sm text-gray-600 break-words">{{ order.customer_phone }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="border-t border-gray-200">
+            <ul role="list" class="divide-y divide-gray-200">
+                {% for item in order.items %}
+                <li class="px-4 py-4 sm:px-6 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-darkgray truncate">{{ item.product_name }}</p>
+                        <p class="text-sm text-gray-500">Cantidad: {{ item.quantity }}</p>
+                    </div>
+                    <div class="text-sm font-medium text-gray-900">
+                        $ {{ "{:,.0f}".format(item.subtotal).replace(',', '.') }}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6 flex justify-end bg-salmon-50">
+            <p class="text-lg font-bold text-darkgray font-serif">Total: $ {{
+                "{:,.0f}".format(order.total).replace(',', '.') }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

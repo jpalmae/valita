@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex h-screen bg-salmon-50">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-salmon-400 text-white text-white flex flex-col">
+        <div class="h-16 flex items-center px-6 border-b border-salmon-300">
+            <h1 class="text-xl font-serif font-bold tracking-wider">Chocolates Patitas de Algodón</h1>
+        </div>
+        <nav class="flex-1 py-4 px-3 space-y-2">
+            <a href="{{ url_for('admin.dashboard') }}"
+                class="flex items-center px-3 py-2.5 rounded-md hover:bg-darkgray text-white font-medium transition-colors">
+                <svg class="w-5 h-5 mr-3 text-salmon-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="{{ url_for('admin.products') }}"
+                class="flex items-center px-3 py-2.5 rounded-md hover:bg-darkgray text-white font-medium transition-colors">
+                <svg class="w-5 h-5 mr-3 text-salmon-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+                Productos
+            </a>
+            <a href="{{ url_for('admin.orders') }}"
+                class="flex items-center px-3 py-2.5 rounded-md hover:bg-darkgray text-white font-medium transition-colors">
+                <svg class="w-5 h-5 mr-3 text-salmon-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                Pedidos
+            </a>
+        </nav>
+        <div class="p-4 border-t border-salmon-300">
+            <div class="text-sm text-salmon-300 mb-3 truncate">{{ current_user.email }}</div>
+            <a href="{{ url_for('admin.logout') }}"
+                class="flex items-center justify-center w-full px-4 py-2 border border-darkgray rounded-md text-sm font-medium text-white hover:bg-darkgray transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                    </path>
+                </svg>
+                Cerrar sesión
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10 border-b border-gray-200">
+            <h2 class="text-2xl font-serif font-semibold text-darkgray">{% block header_title %}Admin{% endblock %}
+            </h2>
+            <div class="flex items-center">
+                <span
+                    class="bg-gray-100 text-darkgray py-1 px-3 rounded-full text-sm font-medium">Administrador</span>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-salmon-50 p-6">
+            {% block admin_content %}{% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

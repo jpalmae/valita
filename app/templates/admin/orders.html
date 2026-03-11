@@ -1,0 +1,101 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Pedidos - Admin Chocolates Patitas de Algodón{% endblock %}
+{% block header_title %}Gestión de Pedidos{% endblock %}
+
+{% block admin_content %}
+<div class="mb-6 flex space-x-2 overflow-x-auto pb-2">
+    <a href="{{ url_for('admin.orders') }}"
+        class="px-4 py-2 rounded-full text-sm font-medium {{ 'bg-salmon-400 text-white shadow' if not current_status else 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300' }}">Todos</a>
+    {% for status in OrderStatus %}
+    <a href="{{ url_for('admin.orders', status=status.value) }}"
+        class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap {{ 'bg-salmon-400 text-white shadow' if current_status == status.value else 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300' }}">
+        {{ status.value | replace('_', ' ') | title }}
+    </a>
+    {% endfor %}
+</div>
+
+<div class="bg-white shadow-sm rounded-lg border border-gray-100 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pedido
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha /
+                        Total</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado
+                        Pago</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado
+                        Pedido</th>
+                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for order in orders %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-darkgray font-serif">{{ order.order_number }}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-gray-900">{{ order.customer_name }}</div>
+                        <div class="text-xs text-gray-500">{{ order.customer_email }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-500">{{ order.created_at.strftime('%d %b %Y %H:%M') }}</div>
+                        <div class="text-sm font-medium text-gray-900 mt-1">$ {{
+                            "{:,.0f}".format(order.total).replace(',', '.') }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if order.payment_status == 'approved' %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Aprobado</span>
+                        {% elif order.payment_status == 'pending' %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pendiente</span>
+                        {% else %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{
+                            order.payment_status }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% set status_colors = {
+                        'recibido': 'bg-yellow-100 text-yellow-800',
+                        'confirmado': 'bg-blue-100 text-blue-800',
+                        'en_fabricacion': 'bg-orange-100 text-orange-800',
+                        'listo_para_entrega': 'bg-teal-100 text-teal-800',
+                        'entregado': 'bg-green-100 text-green-800',
+                        'rechazado': 'bg-red-100 text-red-800',
+                        'cancelado': 'bg-gray-100 text-gray-800'
+                        } %}
+                        {% set color_class = status_colors.get(order.status.value, 'bg-gray-100 text-gray-800') %}
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ color_class }}">
+                            {{ order.status.value | replace('_', ' ') | title }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <a href="{{ url_for('admin.order_detail', id=order.id) }}"
+                            class="text-salmon-600 hover:text-darkgray border border-gray-200 px-3 py-1 rounded bg-white">Ver
+                            detalle</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-10 text-center text-gray-500 font-medium">No se encontraron pedidos.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

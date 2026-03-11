@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}¡Pago Exitoso! - Chocolates Patitas de Algodón{% endblock %}
+
+{% block content %}
+<div class="flex-grow flex items-center justify-center p-6 bg-cream">
+    <div class="bg-white rounded-2xl shadow-xl p-8 sm:p-12 max-w-lg w-full text-center border border-gray-100">
+        <div
+            class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-green-100 mb-8 border-4 border-green-50">
+            <svg class="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        </div>
+        <h2 class="text-3xl font-serif font-bold text-darkgray mb-4">¡Mil gracias por tu compra!</h2>
+        <p class="text-gray-600 mb-8 text-lg">Tu pedido ha sido confirmado y se encuentra en proceso. Te hemos enviado
+            un correo electrónico con los detalles.</p>
+        <a href="/"
+            class="inline-flex w-full items-center justify-center bg-salmon-400 text-white font-medium py-3 px-6 rounded-md hover:bg-salmon-500 transition-colors shadow-sm">
+            Volver a la tienda
+        </a>
+    </div>
+</div>
+{% endblock %}

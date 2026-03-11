@@ -1,0 +1,148 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Pedido {{ order.order_number }} - Admin Chocolates Patitas de Algodón{% endblock %}
+{% block header_title %}Pedido {{ order.order_number }}{% endblock %}
+
+{% block admin_content %}
+<div class="mb-4">
+    <a href="{{ url_for('admin.orders') }}"
+        class="text-sm font-medium text-salmon-600 hover:text-darkgray flex items-center">
+        <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Volver a Pedidos
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Order Info -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Order Items -->
+        <div class="bg-white shadow-sm rounded-lg border border-gray-100 overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-100">
+                <h3 class="text-lg font-medium leading-6 text-darkgray font-serif">Artículos del Pedido</h3>
+            </div>
+            <div class="px-6 py-4">
+                <ul role="list" class="divide-y divide-gray-200">
+                    {% for item in order.items %}
+                    <li class="py-4 flex">
+                        <div class="ml-4 flex-1 flex flex-col">
+                            <div>
+                                <div class="flex justify-between text-base font-medium text-gray-900">
+                                    <h4>{{ item.product_name }}</h4>
+                                    <p class="ml-4">$ {{ "{:,.0f}".format(item.subtotal).replace(',', '.') }}</p>
+                                </div>
+                                <p class="mt-1 text-sm text-gray-500">$ {{
+                                    "{:,.0f}".format(item.unit_price).replace(',', '.') }} x {{ item.quantity }}</p>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <dl class="mt-6 space-y-4 border-t border-gray-200 pt-6">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-gray-600">Subtotal</dt>
+                        <dd class="text-sm font-medium text-gray-900">$ {{ "{:,.0f}".format(order.subtotal).replace(',',
+                            '.') }}</dd>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-gray-200 pt-4">
+                        <dt class="text-base font-bold text-gray-900">Total</dt>
+                        <dd class="text-lg font-bold text-salmon-600">$ {{ "{:,.0f}".format(order.total).replace(',',
+                            '.') }}</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+
+        <!-- Customer Notes -->
+        {% if order.notes %}
+        <div class="bg-yellow-50 shadow-sm rounded-lg border border-yellow-200 p-6">
+            <h3 class="text-sm font-bold text-yellow-800 mb-2 uppercase tracking-wider">Notas del Cliente</h3>
+            <p class="text-yellow-900">{{ order.notes }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar Info & Actions -->
+    <div class="space-y-6">
+        <!-- Actions & Status -->
+        <div class="bg-white shadow-sm rounded-lg border border-gray-100 p-6">
+            <h3 class="text-lg font-medium text-darkgray font-serif mb-4">Estado y Acciones</h3>
+
+            <div class="mb-6 space-y-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Pago MP:</span>
+                    <span
+                        class="font-medium {% if order.payment_status == 'approved' %}text-green-600{% elif order.payment_status == 'pending' %}text-yellow-600{% else %}text-red-600{% endif %}">
+                        {{ order.payment_status }}
+                    </span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">ID Pago MP:</span>
+                    <span class="font-medium text-gray-900">{{ order.mp_payment_id or 'N/A' }}</span>
+                </div>
+            </div>
+
+            <form action="{{ url_for('admin.order_status', id=order.id) }}" method="POST"
+                class="space-y-4 border-t border-gray-200 pt-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                <div>
+                    <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Cambiar Estado
+                        Pedido</label>
+                    <select id="status" name="status"
+                        class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm rounded-md border">
+                        {% for status in OrderStatus %}
+                        <option value="{{ status.value }}" {% if order.status==status %}selected{% endif %}>
+                            {{ status.value | replace('_', ' ') | title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="admin_notes" class="block text-sm font-medium text-gray-700 mb-1">Notas Internas
+                        (Admin)</label>
+                    <textarea id="admin_notes" name="admin_notes" rows="3"
+                        class="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm p-2">{{ order.admin_notes or '' }}</textarea>
+                </div>
+
+                <button type="submit"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-salmon-400 hover:bg-salmon-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-salmon-400">
+                    Actualizar Pedido
+                </button>
+            </form>
+        </div>
+
+        <!-- Customer Data -->
+        <div class="bg-white shadow-sm rounded-lg border border-gray-100 p-6">
+            <h3 class="text-lg font-medium text-darkgray font-serif mb-4">Datos del Cliente</h3>
+            <dl class="space-y-3 text-sm">
+                <div>
+                    <dt class="text-gray-500">Nombre</dt>
+                    <dd class="font-medium text-gray-900">{{ order.customer_name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Email</dt>
+                    <dd class="font-medium text-gray-900"><a href="mailto:{{ order.customer_email }}"
+                            class="text-salmon-600">{{ order.customer_email }}</a></dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">Teléfono</dt>
+                    <dd class="font-medium text-gray-900">{{ order.customer_phone }}</dd>
+                </div>
+                <div>
+                    <dt class="text-gray-500">RUT</dt>
+                    <dd class="font-medium text-gray-900">{{ order.customer_rut or 'No especificado' }}</dd>
+                </div>
+                <div class="pt-3 border-t border-gray-100">
+                    <dt class="text-gray-500 mb-1">Dirección de Entrega</dt>
+                    <dd class="font-medium text-gray-900 bg-gray-50 p-3 rounded border border-gray-100">{{
+                        order.customer_address }}</dd>
+                </div>
+            </dl>
+        </div>
+    </div>
+</div>
+{% endblock %}

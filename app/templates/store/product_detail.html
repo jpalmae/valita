@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} - Chocolates Patitas de Algodón{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="bg-salmon-400 sticky top-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/"
+                    class="text-3xl font-serif text-[#FFF7ED] tracking-wide [text-shadow:0_2px_8px_rgba(103,56,39,0.18)]">Chocolates
+                    Patitas de Algodón</a>
+            </div>
+            <div class="flex items-center space-x-6 text-[#FFF3E6] font-medium">
+                <div class="site-font-toggle hidden sm:flex items-center rounded-full p-1 bg-white/10 backdrop-blur-sm">
+                    <button type="button" data-font-choice="choco-chips" aria-pressed="true"
+                        class="rounded-full px-3 py-1 text-xs font-medium">
+                        Chips
+                    </button>
+                    <button type="button" data-font-choice="choco-recipes" aria-pressed="false"
+                        class="rounded-full px-3 py-1 text-xs font-medium">
+                        Recipes
+                    </button>
+                </div>
+                <a href="/carrito" class="hover:text-white transition flex items-center relative gap-2">
+                    <span class="hidden sm:inline-block">Carrito</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    {% if cart_count > 0 %}
+                    <span id="cart-badge"
+                        class="absolute -top-1 -right-3 bg-white text-salmon-600 text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                        {{ cart_count }}
+                    </span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="bg-white">
+    <div class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div class="lg:grid lg:grid-cols-2 lg:gap-x-16">
+            <!-- Image gallery -->
+            <div
+                class="bg-salmon-50 rounded-lg overflow-hidden flex items-center justify-center aspect-square lg:aspect-auto lg:h-[600px]">
+                {% if product.image_url %}
+                <img src="{{ url_for('static', filename='uploads/' + product.image_url) }}" alt="{{ product.name }}"
+                    class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center text-salmon-200">
+                    <svg class="h-32 w-32 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                            d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4">
+                        </path>
+                    </svg>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Product info -->
+            <div class="mt-12 px-4 sm:px-0 lg:mt-0 flex flex-col justify-center">
+                <nav aria-label="Breadcrumb" class="mb-6">
+                    <ol role="list" class="flex items-center space-x-2 text-sm text-gray-400">
+                        <li><a href="/" class="hover:text-salmon-500 transition-colors">Inicio</a></li>
+                        <li><span class="mx-2">/</span></li>
+                        <li><span class="text-salmon-600 font-medium">{{ product.category }}</span></li>
+                    </ol>
+                </nav>
+
+                <h1 class="text-4xl sm:text-5xl font-serif tracking-tight text-darkgray">{{ product.name }}</h1>
+
+                <div class="mt-4">
+                    <p class="text-3xl text-darkgray font-medium">$ {{ "{:,.0f}".format(product.price).replace(',', '.')
+                        }}</p>
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="sr-only">Descripción</h3>
+                    <div class="text-base text-gray-600 font-light space-y-6 leading-relaxed">
+                        <p>{{ product.description }}</p>
+                    </div>
+                </div>
+
+                {% if product.weight_grams %}
+                <div class="mt-8 pt-8 border-t border-gray-100 flex items-center text-sm text-gray-500">
+                    <svg class="flex-shrink-0 mr-2 h-5 w-5 text-salmon-400" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3">
+                        </path>
+                    </svg>
+                    Peso aproximado: {{ product.weight_grams }} gramos
+                </div>
+                {% endif %}
+
+                <div class="mt-10 pt-8 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
+                    <div class="flex items-center border border-gray-200 rounded-md bg-white w-32 h-14 shrink-0">
+                        <button type="button"
+                            class="px-4 text-gray-500 hover:text-darkgray h-full text-xl transition-colors"
+                            onclick="if(document.getElementById('qty').value > 1) document.getElementById('qty').value--">-</button>
+                        <input type="number" id="qty" name="quantity" value="1" min="1" {% if product.stock !=-1
+                            %}max="{{ product.stock }}" {% endif %}
+                            class="w-full text-center border-none focus:ring-0 text-darkgray font-medium p-0" readonly>
+                        <button type="button"
+                            class="px-4 text-gray-500 hover:text-darkgray h-full text-xl transition-colors"
+                            onclick="document.getElementById('qty').value++">+</button>
+                    </div>
+
+                    <button type="button" onclick="addToCart({{ product.id }})"
+                        class="flex-1 bg-salmon-400 text-white rounded-md py-3 px-8 flex items-center justify-center text-base font-medium hover:bg-salmon-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-salmon-300 h-14 transition-colors">
+                        Agregar al Carrito
+                    </button>
+                </div>
+
+                {% if product.stock > 0 %}
+                <p class="mt-6 text-sm text-gray-400">Quedan {{ product.stock }} unidades disponibles.</p>
+                {% elif product.stock == 0 %}
+                <p class="mt-6 text-sm text-red-500 font-medium">Agotado temporalmente.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-white py-16 border-t border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        <p class="font-serif text-3xl mb-6 text-darkgray tracking-widest">Chocolates Patitas de Algodón</p>
+        <div class="flex space-x-6 mb-8 text-sm font-medium text-gray-500">
+            <a href="/" class="hover:text-salmon-500 transition-colors">Inicio</a>
+            <a href="#" class="hover:text-salmon-500 transition-colors">Contacto</a>
+            <a href="#" class="hover:text-salmon-500 transition-colors">Instagram</a>
+        </div>
+        <p class="text-sm text-gray-400">© 2026 Chocolates Patitas de Algodón. Todos los derechos reservados.</p>
+    </div>
+</footer>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function addToCart(productId) {
+        const quantity = parseInt(document.getElementById('qty').value) || 1;
+        fetch('/carrito/agregar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ product_id: productId, quantity: quantity })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) {
+                        badge.innerText = data.cart_count;
+                    } else {
+                        // Reload if badge wasn't rendered originally
+                        window.location.reload();
+                    }
+
+                    // Cute minimal toast
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-darkgray text-white px-6 py-3 rounded-full text-sm font-medium shadow-xl opacity-0 transition-opacity duration-300 z-50';
+                    toast.innerText = '¡Agregado al carrito!';
+                    document.body.appendChild(toast);
+
+                    requestAnimationFrame(() => {
+                        toast.classList.remove('opacity-0');
+                    });
+
+                    setTimeout(() => {
+                        toast.classList.add('opacity-0');
+                        setTimeout(() => toast.remove(), 300);
+                    }, 3000);
+                }
+            });
+    }
+</script>
+{% endblock %}

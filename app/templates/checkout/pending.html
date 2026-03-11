@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Pago Pendiente - Chocolates Patitas de Algodón{% endblock %}
+
+{% block content %}
+<div class="flex-grow flex items-center justify-center p-6 bg-cream">
+    <div class="bg-white rounded-2xl shadow-xl p-8 sm:p-12 max-w-lg w-full text-center border border-gray-100">
+        <div
+            class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-yellow-100 mb-8 border-4 border-yellow-50">
+            <svg class="h-12 w-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        </div>
+        <h2 class="text-3xl font-serif font-bold text-darkgray mb-4">Pago Pendiente</h2>
+        <p class="text-gray-600 mb-8 text-lg">Tu pago está siendo procesado por MercadoPago. Te contactaremos cuando se
+            confirme.</p>
+        <a href="/"
+            class="inline-flex w-full items-center justify-center border border-gray-300 bg-white text-darkgray font-medium py-3 px-6 rounded-md hover:bg-salmon-50 transition-colors shadow-sm">
+            Volver a la tienda
+        </a>
+    </div>
+</div>
+{% endblock %}

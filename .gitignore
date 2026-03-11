@@ -1,0 +1,11 @@
+.DS_Store
+.env
+__pycache__/
+*.pyc
+
+# Local reference files not needed in the public repo
+Choco Chips.ttf
+choco-recipes-40506953-1.zip
+choco_chips_2.zip
+WhatsApp Image 2026-03-07 at 18.38.04.jpeg
+WhatsApp Image 2026-03-08 at 18.58.17.jpeg

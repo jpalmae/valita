@@ -1,0 +1,15 @@
+flask==3.1.0
+flask-sqlalchemy==3.1.1
+flask-login==0.6.3
+flask-wtf==1.2.1
+flask-limiter==3.7.0
+psycopg2-binary==2.9.9
+mercadopago==2.3.0
+bcrypt==4.1.2
+pillow==10.3.0
+python-dotenv==1.0.1
+gunicorn==21.2.0
+alembic==1.13.1
+flask-migrate==4.0.5
+wtforms==3.1.2
+email-validator==2.1.1

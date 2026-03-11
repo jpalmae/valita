@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Inicio - Chocolates Patitas de Algodón{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+<nav class="bg-salmon-400 sticky top-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/"
+                    class="text-3xl font-serif text-[#FFF7ED] tracking-wide [text-shadow:0_2px_8px_rgba(103,56,39,0.18)]">Chocolates
+                    Patitas de Algodón</a>
+            </div>
+            <div class="flex items-center space-x-6 text-[#FFF3E6] font-medium">
+                <div class="site-font-toggle hidden sm:flex items-center rounded-full p-1 bg-white/10 backdrop-blur-sm">
+                    <button type="button" data-font-choice="choco-chips" aria-pressed="true"
+                        class="rounded-full px-3 py-1 text-xs font-medium">
+                        Chips
+                    </button>
+                    <button type="button" data-font-choice="choco-recipes" aria-pressed="false"
+                        class="rounded-full px-3 py-1 text-xs font-medium">
+                        Recipes
+                    </button>
+                </div>
+                <a href="/carrito"
+                    class="hover:text-white transition flex items-center relative gap-2 [text-shadow:0_2px_8px_rgba(103,56,39,0.18)]">
+                    <span class="hidden sm:inline-block">Carrito</span>
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    {% if cart_count > 0 %}
+                    <span id="cart-badge"
+                        class="absolute -top-1 -right-3 bg-[#FFF7ED] text-[#9D3D25] text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                        {{ cart_count }}
+                    </span>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Parallax Background -->
+<div class="fixed top-0 left-0 w-full h-full z-[-1] overflow-hidden pointer-events-none bg-[#fef8f7]"
+    id="parallax-container">
+    <div class="parallax-layer absolute w-[110%] h-[110%] -top-[5%] -left-[5%] bg-cover bg-top" data-speed-x="0.03"
+        data-speed-y="0.15" style="background-image: url('/static/img/parallax/hills.png');"></div>
+</div>
+
+<!-- Hero Section -->
+<div class="relative min-h-[85vh] flex items-center justify-center overflow-hidden pt-20">
+    <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center p-10 sm:p-16 rounded-3xl relative z-10 transition-transform hover:scale-[1.01] duration-500">
+        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-serif tracking-tight text-[#3B241A] mb-6 [text-shadow:0_2px_10px_rgba(255,248,240,0.35)]">
+            Sabor artesanal,<br>tradición familiar.
+        </h1>
+        <p class="text-lg sm:text-xl max-w-2xl text-[#5F463A] mb-10 font-medium [text-shadow:0_1px_8px_rgba(255,248,240,0.25)]">
+            Descubre nuestra selección premium de chocolates artesanales creados para evocar emociones inolvidables.
+        </p>
+        <a href="#cat-1"
+            class="bg-salmon-500 hover:bg-salmon-600 text-white px-10 py-4 rounded-full font-semibold transition-all shadow-xl hover:shadow-salmon-500/50 hover:-translate-y-1">
+            Ver el menú mágico
+        </a>
+    </div>
+</div>
+
+<!-- Category Navigation -->
+<div class="bg-white/60 backdrop-blur-md py-4 sticky top-20 z-40 border-b border-white/40 shadow-sm relative">
+    <div class="max-w-7xl mx-auto px-4 overflow-x-auto flex space-x-6 justify-center">
+        {% for cat in categories.keys() %}
+        <a href="#cat-{{ loop.index }}"
+            class="text-[#6B4E43] font-medium hover:text-[#A4573B] whitespace-nowrap px-4 py-2 rounded-full text-sm transition-colors uppercase tracking-wider">
+            {{ cat }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Product Catalog -->
+<div class="bg-white/40 backdrop-blur-md relative z-10 pb-20">
+    <div class="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 space-y-20">
+        {% for cat, products_list in categories.items() %}
+        <section id="cat-{{ loop.index }}" class="scroll-mt-44">
+            <h2 class="text-2xl font-serif text-[#4A2C22] mb-10 text-center [text-shadow:0_2px_8px_rgba(255,248,240,0.28)]">{{ cat }}</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+                {% for p in products_list %}
+                <div class="group flex flex-col">
+                    <a href="{{ url_for('main.product_detail', id=p.id) }}"
+                        class="relative block rounded-lg overflow-hidden bg-salmon-50 aspect-[4/3] mb-6">
+                        {% if p.image_url %}
+                        <img src="{{ url_for('static', filename='uploads/' + p.image_url) }}" alt="{{ p.name }}"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center text-salmon-200">
+                            <svg class="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4">
+                                </path>
+                            </svg>
+                        </div>
+                        {% endif %}
+                    </a>
+                    <div class="flex flex-col flex-grow text-center">
+                        <h3
+                            class="text-lg font-medium text-darkgray mb-2 group-hover:text-salmon-600 transition-colors">
+                            <a href="{{ url_for('main.product_detail', id=p.id) }}">{{ p.name }}</a>
+                        </h3>
+                        <p class="text-sm text-gray-500 line-clamp-2 mb-4 font-light">{{ p.description }}</p>
+                        <div class="mt-auto">
+                            <span class="text-lg font-medium text-darkgray block mb-4">$ {{
+                                "{:,.0f}".format(p.price).replace(',', '.') }}</span>
+                            <a href="{{ url_for('main.product_detail', id=p.id) }}"
+                                class="inline-block bg-salmon-50 text-salmon-700 hover:bg-salmon-100 px-6 py-2 rounded-md text-sm font-medium transition-colors">
+                                Ver detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-white/60 relative z-10 backdrop-blur-md py-16 border-t border-white/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        <p class="font-serif text-3xl mb-6 text-[#4A2C22] tracking-widest">Chocolates Patitas de Algodón</p>
+        <div class="flex space-x-6 mb-8 text-sm font-medium text-[#7A5A4C]">
+            <a href="#" class="hover:text-[#A4573B] transition-colors">Inicio</a>
+            <a href="#" class="hover:text-[#A4573B] transition-colors">Contacto</a>
+            <a href="#" class="hover:text-[#A4573B] transition-colors">Instagram</a>
+            <a href="{{ url_for('admin.login') }}" class="hover:text-[#A4573B] transition-colors">Admin Panel</a>
+        </div>
+        <p class="text-sm text-[#9B7D6E]">© 2026 Chocolates Patitas de Algodón. Todos los derechos reservados.</p>
+    </div>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const layers = document.querySelectorAll('.parallax-layer');
+        let scrollY = 0;
+        let mouseX = 0;
+        let mouseY = 0;
+        let ticking = false;
+
+        function updateParallax() {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+
+            layers.forEach(layer => {
+                const speedX = parseFloat(layer.getAttribute('data-speed-x'));
+                const speedY = parseFloat(layer.getAttribute('data-speed-y'));
+
+                // Calculate movement based on scroll and mouse position
+                const x = (mouseX - centerX) * speedX;
+                const y = (mouseY - centerY) * speedY - (scrollY * speedY * 1.5);
+
+                layer.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+            });
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            scrollY = window.scrollY;
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        });
+
+        // Initial call
+        updateParallax();
+    });
+</script>
+{% endblock %}

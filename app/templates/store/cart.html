@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Mi Carrito - Chocolates Patitas de Algodón{% endblock %}
+
+{% block content %}
+<!-- Navbar simplificado -->
+<nav class="bg-salmon-400 sticky top-0 z-50 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-20 items-center">
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/" class="text-3xl font-serif text-white tracking-wide">Chocolates Patitas de Algodón</a>
+            </div>
+            <div class="flex items-center">
+                <a href="/" class="text-sm font-medium text-salmon-50 hover:text-white transition">Seguir comprando</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="bg-white min-h-[70vh]">
+    <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
+        <h1 class="text-4xl font-serif tracking-tight text-darkgray mb-12 text-center">Tu Carrito</h1>
+
+        {% if cart %}
+        <div class="lg:grid lg:grid-cols-12 lg:gap-x-16 lg:items-start">
+            <div class="lg:col-span-7">
+                <ul role="list" class="divide-y divide-gray-100 border-t border-b border-gray-100">
+                    {% for item in cart.values() %}
+                    <li class="flex py-8" id="cart-item-{{ item.product_id }}">
+                        <div class="flex-shrink-0">
+                            {% if item.image_url %}
+                            <img src="{{ url_for('static', filename='uploads/' + item.image_url) }}" alt="{{ item.name }}"
+                                class="w-24 h-24 rounded-lg object-center object-cover sm:w-32 sm:h-32 bg-salmon-50">
+                            {% else %}
+                            <div
+                                class="w-24 h-24 rounded-lg sm:w-32 sm:h-32 bg-salmon-50 flex items-center justify-center text-salmon-200">
+                                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="ml-6 flex-1 flex flex-col justify-between">
+                            <div class="relative sm:grid sm:grid-cols-2 sm:gap-x-6 sm:pr-0">
+                                <div>
+                                    <h3 class="text-lg font-medium text-darkgray">
+                                        <a href="{{ url_for('main.product_detail', id=item.product_id) }}"
+                                            class="hover:text-salmon-500 transition-colors">{{ item.name }}</a>
+                                    </h3>
+                                    <p class="mt-2 text-sm text-gray-500 font-light">$ {{
+                                        "{:,.0f}".format(item.price).replace(',', '.') }} c/u</p>
+                                </div>
+
+                                <div class="mt-4 sm:mt-0 flex flex-col items-start sm:items-end">
+                                    <div class="flex items-center border border-gray-200 w-28 rounded-md bg-white h-10">
+                                        <button onclick="updateCartItem({{ item.product_id }}, {{ item.quantity - 1 }})"
+                                            class="px-3 text-gray-500 hover:text-darkgray transition-colors h-full">-</button>
+                                        <span class="w-full text-center font-medium text-sm text-darkgray">{{
+                                            item.quantity }}</span>
+                                        <button onclick="updateCartItem({{ item.product_id }}, {{ item.quantity + 1 }})"
+                                            class="px-3 text-gray-500 hover:text-darkgray transition-colors h-full">+</button>
+                                    </div>
+                                    <button type="button" onclick="removeCartItem({{ item.product_id }})"
+                                        class="mt-4 text-sm text-gray-400 hover:text-salmon-600 transition-colors flex items-center gap-1">
+                                        <span>Remover</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Order summary -->
+            <section aria-labelledby="summary-heading" class="mt-16 bg-salmon-50 rounded-2xl p-8 lg:mt-0 lg:col-span-5">
+                <h2 id="summary-heading" class="text-xl font-serif text-darkgray mb-6">Resumen del Pedido</h2>
+
+                <dl class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-gray-600">Subtotal</dt>
+                        <dd class="text-sm font-medium text-darkgray" id="summary-subtotal">$ {{
+                            "{:,.0f}".format(subtotal).replace(',', '.') }}</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-gray-600">Envío</dt>
+                        <dd class="text-sm font-medium text-darkgray">$ 0</dd>
+                    </div>
+                    <div class="border-t border-salmon-200 pt-6 mt-6 flex items-center justify-between">
+                        <dt class="text-xl font-medium text-darkgray">Total</dt>
+                        <dd class="text-2xl font-semibold text-darkgray" id="summary-total">$ {{
+                            "{:,.0f}".format(total).replace(',', '.') }}</dd>
+                    </div>
+                </dl>
+
+                <div class="mt-10">
+                    <a href="/checkout"
+                        class="w-full bg-salmon-400 rounded-md py-4 px-4 text-base font-medium text-white hover:bg-salmon-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-salmon-300 flex justify-center items-center transition-all shadow-sm">
+                        Proceder al Checkout
+                    </a>
+                </div>
+            </section>
+        </div>
+        {% else %}
+        <div class="text-center py-20 bg-salmon-50 rounded-2xl max-w-2xl mx-auto">
+            <svg class="mx-auto h-16 w-16 text-salmon-300 mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <h3 class="text-2xl font-serif text-darkgray mb-3">Tu carrito está vacío</h3>
+            <p class="text-gray-500 mb-8 font-light">¿Aún no te decides? Explora nuestras deliciosas opciones.</p>
+            <a href="/"
+                class="inline-flex items-center px-8 py-3 rounded-md text-white bg-salmon-400 hover:bg-salmon-500 font-medium transition-colors shadow-sm">
+                Volver a la tienda
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function updateCartItem(productId, newQty) {
+        if (newQty <= 0) {
+            removeCartItem(productId);
+            return;
+        }
+
+        fetch('/carrito/actualizar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ product_id: productId, quantity: newQty })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Recargar para ver los cambios fácilmente por ahora
+                }
+            });
+    }
+
+    function removeCartItem(productId) {
+        fetch('/carrito/eliminar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+    }
+</script>
+{% endblock %}

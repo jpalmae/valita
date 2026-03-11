@@ -1,0 +1,43 @@
+from flask import Flask
+from config import Config
+from extensions import db, login_manager, migrate, csrf, limiter
+
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
+    # Inicializar extensiones
+    db.init_app(app)
+    login_manager.init_app(app)
+    migrate.init_app(app, db)
+    csrf.init_app(app)
+    limiter.init_app(app)
+
+    # Import models
+    import models
+
+    # Blueprints
+    from routes.admin import admin_bp
+    from routes.main import main_bp
+    from routes.checkout import checkout_bp
+    from routes.payment import payment_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
+    app.register_blueprint(main_bp)
+    app.register_blueprint(checkout_bp)
+    app.register_blueprint(payment_bp)
+
+    # Register CLI commands
+    from utils.seed import seed_products, seed_admin
+    @app.cli.command("seed")
+    def seed():
+        """Seed database with test data."""
+        seed_admin()
+        seed_products()
+        print("Database seeded successfully!")
+
+    return app
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

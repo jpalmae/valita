@@ -1,0 +1,2 @@
+-- Archivo de inicialización de base de datos
+-- (Vacio por ahora, Flask-Migrate se encargará de las tablas)

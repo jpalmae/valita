@@ -1,0 +1,122 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}{{ 'Editar' if product else 'Nuevo' }} Producto - Admin Chocolates Patitas de Algodón{% endblock %}
+{% block header_title %}{{ 'Editar Producto' if product else 'Nuevo Producto' }}{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white shadow-sm rounded-lg border border-gray-100 p-6 max-w-4xl mx-auto">
+    <form action="" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div class="sm:col-span-4">
+                <label for="name" class="block text-sm font-medium text-gray-700">Nombre del Producto</label>
+                <div class="mt-1">
+                    <input type="text" name="name" id="name" value="{{ product.name if product else '' }}" required
+                        class="shadow-sm focus:ring-salmon-400 focus:border-salmon-400 block w-full sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                </div>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="category" class="block text-sm font-medium text-gray-700">Categoría</label>
+                <div class="mt-1">
+                    <select id="category" name="category"
+                        class="shadow-sm focus:ring-salmon-400 focus:border-salmon-400 block w-full sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                        <option value="">Seleccione...</option>
+                        <option value="Tabletas" {% if product and product.category=='Tabletas' %}selected{% endif %}>
+                            Tabletas</option>
+                        <option value="Bombones" {% if product and product.category=='Bombones' %}selected{% endif %}>
+                            Bombones</option>
+                        <option value="Gift Box" {% if product and product.category=='Gift Box' %}selected{% endif %}>
+                            Gift Box</option>
+                        <option value="Trufas" {% if product and product.category=='Trufas' %}selected{% endif %}>Trufas
+                        </option>
+                        <option value="Otros" {% if product and product.category=='Otros' %}selected{% endif %}>Otros
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sm:col-span-6">
+                <label for="description" class="block text-sm font-medium text-gray-700">Descripción</label>
+                <div class="mt-1">
+                    <textarea id="description" name="description" rows="3"
+                        class="shadow-sm focus:ring-salmon-400 focus:border-salmon-400 block w-full sm:text-sm border border-gray-300 rounded-md py-2 px-3">{{ product.description if product else '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="price" class="block text-sm font-medium text-gray-700">Precio (CLP)</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">$</span>
+                    </div>
+                    <input type="number" name="price" id="price" value="{{ product.price if product else '' }}" required
+                        min="0" step="1"
+                        class="focus:ring-salmon-400 focus:border-salmon-400 block w-full pl-7 sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                </div>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="stock" class="block text-sm font-medium text-gray-700">Stock</label>
+                <div class="mt-1">
+                    <input type="number" name="stock" id="stock" value="{{ product.stock if product else '-1' }}"
+                        required
+                        class="shadow-sm focus:ring-salmon-400 focus:border-salmon-400 block w-full sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                </div>
+                <p class="mt-2 text-xs text-gray-500">-1 para stock ilimitado</p>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="weight_grams" class="block text-sm font-medium text-gray-700">Peso (Gramos)</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <input type="number" name="weight_grams" id="weight_grams"
+                        value="{{ product.weight_grams if product else '' }}" min="0"
+                        class="focus:ring-salmon-400 focus:border-salmon-400 block w-full pr-12 sm:text-sm border-gray-300 rounded-md py-2 px-3 border">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">g</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sm:col-span-6">
+                <label class="block text-sm font-medium text-gray-700">Imagen del Producto</label>
+                <div class="mt-1 flex items-center">
+                    {% if product and product.image_url %}
+                    <img src="{{ url_for('static', filename='uploads/' + product.image_url) }}" alt="Preview"
+                        class="h-16 w-16 object-cover rounded mr-4">
+                    {% endif %}
+                    <input type="file" name="image" id="image" accept="image/png, image/jpeg, image/jpg"
+                        class="focus:ring-salmon-400 focus:border-salmon-400 block w-full sm:text-sm border-gray-300 rounded-md py-2 px-3 border text-gray-500">
+                </div>
+                <p class="mt-2 text-xs text-gray-500">JPG o PNG hasta 5MB. Se redimensionará automáticamente al
+                    mostrarse.</p>
+            </div>
+
+            <div class="sm:col-span-6">
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="is_active" name="is_active" type="checkbox" {% if not product or product.is_active
+                            %}checked{% endif %}
+                            class="focus:ring-salmon-400 h-4 w-4 text-salmon-600 border-gray-300 rounded">
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="is_active" class="font-medium text-gray-700">Activo (Visible en la tienda)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-5 border-t border-gray-200 mt-6 flex justify-end space-x-3">
+            <a href="{{ url_for('admin.products') }}"
+                class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-salmon-400">
+                Cancelar
+            </a>
+            <button type="submit"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-salmon-400 hover:bg-salmon-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-salmon-400">
+                Guardar
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

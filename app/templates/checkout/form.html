@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Checkout - Chocolates Patitas de Algodón{% endblock %}
+
+{% block content %}
+<nav class="bg-salmon-400 text-white border-b border-salmon-300 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex-shrink-0 flex items-center">
+                <a href="/" class="text-2xl font-serif text-white tracking-widest">Chocolates Patitas de Algodón</a>
+            </div>
+            <div class="flex items-center text-salmon-300">
+                <span class="mr-2">Pago Seguro</span>
+                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="lg:grid lg:grid-cols-12 lg:gap-x-12">
+        <div class="lg:col-span-8">
+            <h2 class="text-2xl font-extrabold font-serif tracking-tight text-darkgray mb-6">Detalles de Envío y
+                Facturación</h2>
+
+            <form action="{{ url_for('checkout.checkout') }}" method="POST" id="checkout-form"
+                class="bg-white shadow-sm border border-gray-200 rounded-lg p-6 sm:p-8">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                <div class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                    <div class="sm:col-span-2">
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nombre Completo *</label>
+                        <input type="text" name="name" id="name" required
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm py-2 px-3 border">
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico *</label>
+                        <input type="email" name="email" id="email" required
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm py-2 px-3 border">
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono *</label>
+                        <input type="tel" name="phone" id="phone" required
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm py-2 px-3 border">
+                    </div>
+
+                    <div>
+                        <label for="rut" class="block text-sm font-medium text-gray-700">RUT (Opcional, para
+                            boleta/factura)</label>
+                        <input type="text" name="rut" id="rut" placeholder="12.345.678-9"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm py-2 px-3 border">
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label for="address" class="block text-sm font-medium text-gray-700">Dirección de Entrega * (Calle,
+                        Número, Depto, Comuna)</label>
+                    <textarea id="address" name="address" rows="3" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm py-2 px-3"></textarea>
+                </div>
+
+                <div class="mt-6">
+                    <label for="notes" class="block text-sm font-medium text-gray-700">Notas Adicionales
+                        (Opcional)</label>
+                    <textarea id="notes" name="notes" rows="2" placeholder="Instrucciones para la entrega..."
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-salmon-400 focus:border-salmon-400 sm:text-sm py-2 px-3"></textarea>
+                </div>
+            </form>
+        </div>
+
+        <!-- Order Summary Sidebar -->
+        <div class="lg:col-span-4 mt-8 lg:mt-0">
+            <div class="bg-salmon-50 shadow-sm border border-gray-200 rounded-lg px-4 py-6 sm:p-6 lg:p-8">
+                <h2 class="text-lg font-medium text-darkgray font-serif mb-6">Resumen del Pedido</h2>
+
+                <ul role="list" class="divide-y divide-gray-200">
+                    {% for item in cart.values() %}
+                    <li class="flex py-4">
+                        {% if item.image_url %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.image_url) }}" alt="{{ item.name }}"
+                            class="h-16 w-16 rounded-md object-cover object-center border border-gray-100">
+                        {% endif %}
+                        <div class="ml-4 flex-1 flex flex-col">
+                            <div>
+                                <div class="flex justify-between text-base font-medium text-gray-900">
+                                    <h3 class="text-sm truncate max-w-[150px]">{{ item.name }}</h3>
+                                    <p class="ml-4">$ {{ "{:,.0f}".format(item.price * item.quantity).replace(',', '.')
+                                        }}</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex items-end justify-between text-sm">
+                                <p class="text-gray-500">Cant: {{ item.quantity }}</p>
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <dl class="mt-6 space-y-4 border-t border-gray-200 pt-6">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-gray-600">Subtotal</dt>
+                        <dd class="text-sm font-medium text-gray-900">$ {{ "{:,.0f}".format(subtotal).replace(',', '.')
+                            }}</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-sm text-gray-600">Envío</dt>
+                        <dd class="text-sm font-medium text-gray-900">$ 0</dd>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-gray-200 pt-4">
+                        <dt class="text-base font-bold text-gray-900">Total a Pagar</dt>
+                        <dd class="text-xl font-bold text-salmon-600">$ {{ "{:,.0f}".format(total).replace(',', '.')
+                            }}</dd>
+                    </div>
+                </dl>
+
+                <div class="mt-8">
+                    <button type="submit" form="checkout-form"
+                        class="w-full flex justify-center items-center bg-[#009EE3] border border-transparent rounded-md shadow-sm py-3 px-4 text-white hover:bg-[#008ACA] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#009EE3] transition-colors font-medium">
+                        Pagar con MercadoPago
+                    </button>
+                    <p class="text-xs text-center text-gray-500 mt-4">Al hacer clic en pagar serás redirigido a la
+                        pasarela segura de MercadoPago.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

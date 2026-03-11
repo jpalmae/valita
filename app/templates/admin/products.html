@@ -1,0 +1,105 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Productos - Admin Chocolates Patitas de Algodón{% endblock %}
+{% block header_title %}Productos{% endblock %}
+
+{% block admin_content %}
+<div class="bg-white shadow-sm rounded-lg border border-gray-100 overflow-hidden">
+    <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
+        <h3 class="text-lg font-medium leading-6 text-darkgray font-serif">Catálogo de Productos</h3>
+        <a href="{{ url_for('admin.product_new') }}"
+            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-salmon-400 hover:bg-salmon-500">
+            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Nuevo Producto
+        </a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto
+                    </th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio /
+                        Stock</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado
+                    </th>
+                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                {% for p in products %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10">
+                                {% if p.image_url %}
+                                <img class="h-10 w-10 rounded object-cover"
+                                    src="{{ url_for('static', filename='uploads/' + p.image_url) }}" alt="{{ p.name }}">
+                                {% else %}
+                                <div
+                                    class="h-10 w-10 rounded bg-gray-100 flex items-center justify-center text-gray-500">
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ p.name }}</div>
+                                <div class="text-sm text-gray-500">{{ p.category or 'Sin Categoría' }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">$ {{ "{:,.0f}".format(p.price).replace(',', '.') }}</div>
+                        <div class="text-sm text-gray-500">{% if p.stock == -1 %}Ilimitado{% else %}{{ p.stock }} u.{%
+                            endif %}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span
+                            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ 'bg-green-100 text-green-800' if p.is_active else 'bg-red-100 text-red-800' }}">
+                            {{ 'Activo' if p.is_active else 'Inactivo' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div class="flex justify-end items-center space-x-3">
+                            <a href="{{ url_for('admin.product_edit', id=p.id) }}"
+                                class="text-salmon-600 hover:text-darkgray">Editar</a>
+                            <form action="{{ url_for('admin.product_toggle', id=p.id) }}" method="POST" class="inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="text-gray-500 hover:text-gray-700">
+                                    {{ 'Desactivar' if p.is_active else 'Activar' }}
+                                </button>
+                            </form>
+                            {% if p.id in linked_product_ids %}
+                            <span class="text-xs text-gray-400" title="Tiene historial de pedidos">No eliminable</span>
+                            {% else %}
+                            <form action="{{ url_for('admin.product_delete', id=p.id) }}" method="POST" class="inline"
+                                onsubmit="return confirm('Se eliminara este producto de forma permanente. Continuar?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit" class="text-red-600 hover:text-red-800">
+                                    Eliminar
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="px-6 py-10 text-center text-gray-500">No hay productos en el catálogo.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
