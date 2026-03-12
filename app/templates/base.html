@@ -5,105 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Chocolates Patitas de Algodón{% endblock %}</title>
-    <!-- Tailwind CSS (CDN for Development) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        (() => {
-            const savedFont = localStorage.getItem('site-font');
-            const initialFont = savedFont === 'choco-recipes' ? 'choco-recipes' : 'choco-chips';
-            document.documentElement.dataset.siteFont = initialFont;
-        })();
-
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        salmon: {
-                            50: '#fef8f7',
-                            100: '#fdf0ec',
-                            200: '#fbdbd2',
-                            300: '#f9c1b3',
-                            400: '#f7b7a6',
-                            500: '#f1886c',
-                            600: '#e36240',
-                            700: '#be4828',
-                            800: '#9d3d25',
-                            900: '#833724',
-                        },
-                        darkgray: '#121212',
-                    },
-                    fontFamily: {
-                        serif: ['Choco Chips', 'serif'],
-                        sans: ['Choco Chips', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     {% block head %}{% endblock %}
-
-    <style>
-        @font-face {
-            font-family: 'Choco Chips';
-            src: url("{{ url_for('static', filename='fonts/choco-chips.ttf') }}") format('truetype');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        @font-face {
-            font-family: 'Choco Recipes';
-            src: url("{{ url_for('static', filename='fonts/choco-recipes.ttf') }}") format('truetype');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        :root {
-            --site-font-family: 'Choco Chips', sans-serif;
-        }
-
-        html[data-site-font='choco-recipes'] {
-            --site-font-family: 'Choco Recipes', sans-serif;
-        }
-
-        body,
-        .font-sans,
-        .font-serif,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        p,
-        a,
-        span,
-        div {
-            font-family: var(--site-font-family) !important;
-        }
-
-        .site-font-toggle [data-font-choice] {
-            background: rgba(255, 247, 237, 0.18);
-            border: 1px solid rgba(255, 247, 237, 0.28);
-            color: #fff7ed;
-            transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
-        }
-
-        .site-font-toggle [data-font-choice][aria-pressed='true'] {
-            background: #fff7ed;
-            border-color: #fff7ed;
-            color: #9d3d25;
-        }
-    </style>
 </head>
 
-<body class="bg-transparent text-darkgray font-sans min-h-screen flex flex-col antialiased">
+<body data-page="{% block page_id %}base{% endblock %}" data-csrf-token="{{ csrf_token() }}"
+    class="bg-transparent text-darkgray font-sans min-h-screen flex flex-col antialiased">
 
     <!-- Flash Messages (Global) -->
     <div class="fixed top-4 right-4 z-50 space-y-2" id="flash-messages">
@@ -137,39 +44,7 @@
     </main>
 
     {% block scripts %}
-    <script>
-        const savedFont = localStorage.getItem('site-font');
-        const root = document.documentElement;
-
-        function applySiteFont(fontName) {
-            const nextFont = fontName === 'choco-recipes' ? 'choco-recipes' : 'choco-chips';
-            root.dataset.siteFont = nextFont;
-            localStorage.setItem('site-font', nextFont);
-            document.querySelectorAll('[data-font-choice]').forEach((button) => {
-                button.setAttribute('aria-pressed', String(button.dataset.fontChoice === nextFont));
-            });
-        }
-
-        applySiteFont(savedFont || root.dataset.siteFont);
-
-        document.addEventListener('click', (event) => {
-            const toggleButton = event.target.closest('[data-font-choice]');
-            if (!toggleButton) {
-                return;
-            }
-
-            applySiteFont(toggleButton.dataset.fontChoice);
-        });
-
-        // Auto-hide flash messages after 5 seconds
-        setTimeout(() => {
-            const flashes = document.querySelectorAll('#flash-messages > div');
-            flashes.forEach(el => {
-                el.style.opacity = '0';
-                setTimeout(() => el.remove(), 300);
-            });
-        }, 5000);
-    </script>
+    <script src="{{ url_for('static', filename='js/site.js') }}"></script>
     {% endblock %}
 </body>
 

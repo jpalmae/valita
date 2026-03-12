@@ -11,6 +11,18 @@ class OrderStatus(enum.Enum):
     RECHAZADO = "rechazado"
     CANCELADO = "cancelado"
 
+
+class OrderStatusHistory(db.Model):
+    __tablename__ = 'order_status_history'
+
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False, index=True)
+    previous_status = db.Column(db.Enum(OrderStatus), nullable=True)
+    new_status = db.Column(db.Enum(OrderStatus), nullable=False)
+    note = db.Column(db.Text, nullable=True)
+    changed_by = db.Column(db.String(150), nullable=True)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+
 class Order(db.Model):
     __tablename__ = 'orders'
     
@@ -34,3 +46,10 @@ class Order(db.Model):
     admin_notes = db.Column(db.Text, nullable=True)
 
     items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
+    status_history = db.relationship(
+        'OrderStatusHistory',
+        backref='order',
+        lazy=True,
+        cascade='all, delete-orphan',
+        order_by='OrderStatusHistory.created_at.desc()',
+    )

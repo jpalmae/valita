@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ product.name }} - Chocolates Patitas de Algodón{% endblock %}
+{% block page_id %}store-product{% endblock %}
 
 {% block content %}
 <!-- Navbar -->
@@ -96,20 +97,43 @@
                 </div>
                 {% endif %}
 
+                <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="rounded-2xl border border-gray-100 bg-salmon-50/60 p-4">
+                        <p class="text-xs uppercase tracking-wider text-gray-500 mb-2">Peso</p>
+                        <p class="text-sm font-medium text-darkgray">
+                            {% if product.weight_grams %}
+                            {{ product.weight_grams }} g aprox.
+                            {% else %}
+                            Según formato elegido
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-gray-100 bg-salmon-50/60 p-4">
+                        <p class="text-xs uppercase tracking-wider text-gray-500 mb-2">Ingredientes</p>
+                        <p class="text-sm text-gray-600">Chocolate artesanal y rellenos según variedad. Consulta el
+                            detalle exacto al confirmar tu pedido.</p>
+                    </div>
+                    <div class="rounded-2xl border border-gray-100 bg-salmon-50/60 p-4">
+                        <p class="text-xs uppercase tracking-wider text-gray-500 mb-2">Alérgenos</p>
+                        <p class="text-sm text-gray-600">Puede contener leche, soya, maní o frutos secos por
+                            manipulación compartida.</p>
+                    </div>
+                </div>
+
                 <div class="mt-10 pt-8 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
                     <div class="flex items-center border border-gray-200 rounded-md bg-white w-32 h-14 shrink-0">
                         <button type="button"
                             class="px-4 text-gray-500 hover:text-darkgray h-full text-xl transition-colors"
-                            onclick="if(document.getElementById('qty').value > 1) document.getElementById('qty').value--">-</button>
+                            onclick="ValitaStore.updateQuantity(-1)">-</button>
                         <input type="number" id="qty" name="quantity" value="1" min="1" {% if product.stock !=-1
                             %}max="{{ product.stock }}" {% endif %}
                             class="w-full text-center border-none focus:ring-0 text-darkgray font-medium p-0" readonly>
                         <button type="button"
                             class="px-4 text-gray-500 hover:text-darkgray h-full text-xl transition-colors"
-                            onclick="document.getElementById('qty').value++">+</button>
+                            onclick="ValitaStore.updateQuantity(1)">+</button>
                     </div>
 
-                    <button type="button" onclick="addToCart({{ product.id }})"
+                    <button type="button" onclick="ValitaStore.addToCart({{ product.id }}, parseInt(document.getElementById('qty').value, 10) || 1)"
                         class="flex-1 bg-salmon-400 text-white rounded-md py-3 px-8 flex items-center justify-center text-base font-medium hover:bg-salmon-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-salmon-300 h-14 transition-colors">
                         Agregar al Carrito
                     </button>
@@ -126,59 +150,11 @@
 </div>
 
 <!-- Footer -->
-<footer class="bg-white py-16 border-t border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-        <p class="font-serif text-3xl mb-6 text-darkgray tracking-widest">Chocolates Patitas de Algodón</p>
-        <div class="flex space-x-6 mb-8 text-sm font-medium text-gray-500">
-            <a href="/" class="hover:text-salmon-500 transition-colors">Inicio</a>
-            <a href="#" class="hover:text-salmon-500 transition-colors">Contacto</a>
-            <a href="#" class="hover:text-salmon-500 transition-colors">Instagram</a>
-        </div>
-        <p class="text-sm text-gray-400">© 2026 Chocolates Patitas de Algodón. Todos los derechos reservados.</p>
-    </div>
-</footer>
+{% include "store/_footer.html" %}
 
 {% endblock %}
 
 {% block scripts %}
-<script>
-    function addToCart(productId) {
-        const quantity = parseInt(document.getElementById('qty').value) || 1;
-        fetch('/carrito/agregar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ product_id: productId, quantity: quantity })
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const badge = document.getElementById('cart-badge');
-                    if (badge) {
-                        badge.innerText = data.cart_count;
-                    } else {
-                        // Reload if badge wasn't rendered originally
-                        window.location.reload();
-                    }
-
-                    // Cute minimal toast
-                    const toast = document.createElement('div');
-                    toast.className = 'fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-darkgray text-white px-6 py-3 rounded-full text-sm font-medium shadow-xl opacity-0 transition-opacity duration-300 z-50';
-                    toast.innerText = '¡Agregado al carrito!';
-                    document.body.appendChild(toast);
-
-                    requestAnimationFrame(() => {
-                        toast.classList.remove('opacity-0');
-                    });
-
-                    setTimeout(() => {
-                        toast.classList.add('opacity-0');
-                        setTimeout(() => toast.remove(), 300);
-                    }, 3000);
-                }
-            });
-    }
-</script>
+{{ super() }}
+<script src="{{ url_for('static', filename='js/store.js') }}"></script>
 {% endblock %}

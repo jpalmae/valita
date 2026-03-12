@@ -1,0 +1,35 @@
+<footer class="bg-white/60 relative z-10 backdrop-blur-md py-16 border-t border-white/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="store-footer-card rounded-3xl border border-white/50 p-6">
+                <p class="font-serif text-3xl mb-4 text-[#4A2C22] tracking-widest">Chocolates Patitas de Algodón</p>
+                <p class="text-sm text-[#7A5A4C] leading-6">
+                    Chocolatería artesanal para pedidos especiales, regalos y celebraciones con despacho coordinado.
+                </p>
+            </div>
+            <div class="store-footer-card rounded-3xl border border-white/50 p-6">
+                <p class="text-xs uppercase tracking-[0.3em] text-[#9B7D6E] mb-3">Contacto</p>
+                <div class="space-y-2 text-sm text-[#6F5245]">
+                    <a href="mailto:admin@chocolatesvalita.cl" class="block hover:text-[#A4573B] transition-colors">
+                        admin@chocolatesvalita.cl
+                    </a>
+                    <a href="{{ url_for('main.index') }}" class="block hover:text-[#A4573B] transition-colors">
+                        Explorar catálogo
+                    </a>
+                    <a href="{{ url_for('admin.login') }}" class="block hover:text-[#A4573B] transition-colors">
+                        Panel de administración
+                    </a>
+                </div>
+            </div>
+            <div class="store-footer-card rounded-3xl border border-white/50 p-6">
+                <p class="text-xs uppercase tracking-[0.3em] text-[#9B7D6E] mb-3">Compra Segura</p>
+                <div class="space-y-2 text-sm text-[#6F5245]">
+                    <p>Pagos protegidos por MercadoPago.</p>
+                    <p>Seguimiento de pedidos en línea.</p>
+                    <p>Confirmación manual de producción y entrega.</p>
+                </div>
+            </div>
+        </div>
+        <p class="text-sm text-[#9B7D6E] text-center mt-8">© 2026 Chocolates Patitas de Algodón. Todos los derechos reservados.</p>
+    </div>
+</footer>

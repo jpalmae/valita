@@ -12,4 +12,4 @@ login_manager.login_message = 'Por favor inicia sesión para acceder a esta pág
 login_manager.login_message_category = 'warning'
 migrate = Migrate()
 csrf = CSRFProtect()
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(key_func=get_remote_address, storage_uri='memory://')

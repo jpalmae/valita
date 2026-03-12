@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, session, jsonify, redirect, url_for, flash
 from models.product import Product
-from models.order import Order, OrderStatus
+from models.order import Order, OrderStatus, OrderStatusHistory
 from models.order_item import OrderItem
-from extensions import db
+from extensions import db, limiter
 from utils.mercadopago import create_preference
 from datetime import datetime
 import random
@@ -18,6 +18,7 @@ def cart():
     return render_template('store/cart.html', cart=cart_data, subtotal=subtotal, total=total)
 
 @checkout_bp.route('/carrito/agregar', methods=['POST'])
+@limiter.limit("60 per minute")
 def add_to_cart():
     data = request.get_json()
     product_id = str(data.get('product_id'))
@@ -54,6 +55,7 @@ def add_to_cart():
     })
 
 @checkout_bp.route('/carrito/actualizar', methods=['POST'])
+@limiter.limit("60 per minute")
 def update_cart():
     data = request.get_json()
     product_id = str(data.get('product_id'))
@@ -80,6 +82,7 @@ def update_cart():
     })
 
 @checkout_bp.route('/carrito/eliminar', methods=['POST'])
+@limiter.limit("60 per minute")
 def remove_from_cart():
     data = request.get_json()
     product_id = str(data.get('product_id'))
@@ -106,6 +109,7 @@ def generate_order_number():
     return f"VAL-{date_str}-{random_str}"
 
 @checkout_bp.route('/checkout', methods=['GET', 'POST'])
+@limiter.limit("20 per hour", methods=["POST"])
 def checkout():
     cart = session.get('cart', {})
     if not cart:
@@ -139,6 +143,16 @@ def checkout():
         )
         db.session.add(order)
         db.session.flush()
+
+        db.session.add(
+            OrderStatusHistory(
+                order_id=order.id,
+                previous_status=None,
+                new_status=OrderStatus.RECIBIDO,
+                note='Pedido creado desde checkout.',
+                changed_by='cliente',
+            )
+        )
         
         for item in cart.values():
             order_item = OrderItem(

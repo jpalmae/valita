@@ -4,11 +4,45 @@
 {% block header_title %}Gestión de Pedidos{% endblock %}
 
 {% block admin_content %}
+<div class="bg-white shadow-sm rounded-lg border border-gray-100 p-5 mb-6">
+    <form method="GET" action="{{ url_for('admin.orders') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="md:col-span-2">
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+            <input id="search" name="search" type="text" value="{{ search }}"
+                placeholder="N° pedido, nombre o email"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-salmon-400 focus:ring-salmon-400">
+        </div>
+        <div>
+            <label for="date_from" class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
+            <input id="date_from" name="date_from" type="date" value="{{ date_from }}"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-salmon-400 focus:ring-salmon-400">
+        </div>
+        <div>
+            <label for="date_to" class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
+            <input id="date_to" name="date_to" type="date" value="{{ date_to }}"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-salmon-400 focus:ring-salmon-400">
+        </div>
+        {% if current_status %}
+        <input type="hidden" name="status" value="{{ current_status }}">
+        {% endif %}
+        <div class="md:col-span-4 flex flex-wrap gap-3">
+            <button type="submit"
+                class="inline-flex items-center rounded-md bg-salmon-400 px-4 py-2 text-sm font-medium text-white hover:bg-salmon-500">
+                Aplicar filtros
+            </button>
+            <a href="{{ url_for('admin.orders') }}"
+                class="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Limpiar
+            </a>
+        </div>
+    </form>
+</div>
+
 <div class="mb-6 flex space-x-2 overflow-x-auto pb-2">
-    <a href="{{ url_for('admin.orders') }}"
+    <a href="{{ url_for('admin.orders', search=search, date_from=date_from, date_to=date_to) }}"
         class="px-4 py-2 rounded-full text-sm font-medium {{ 'bg-salmon-400 text-white shadow' if not current_status else 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300' }}">Todos</a>
     {% for status in OrderStatus %}
-    <a href="{{ url_for('admin.orders', status=status.value) }}"
+    <a href="{{ url_for('admin.orders', status=status.value, search=search, date_from=date_from, date_to=date_to) }}"
         class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap {{ 'bg-salmon-400 text-white shadow' if current_status == status.value else 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300' }}">
         {{ status.value | replace('_', ' ') | title }}
     </a>
@@ -83,9 +117,20 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="{{ url_for('admin.order_detail', id=order.id) }}"
-                            class="text-salmon-600 hover:text-darkgray border border-gray-200 px-3 py-1 rounded bg-white">Ver
-                            detalle</a>
+                        <div class="flex items-center justify-end gap-2">
+                            {% if order.status.value == 'recibido' %}
+                            <form action="{{ url_for('admin.order_accept', id=order.id) }}" method="POST" class="inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                <button type="submit"
+                                    class="rounded bg-green-50 px-3 py-1 text-green-700 border border-green-200 hover:bg-green-100">
+                                    Aceptar
+                                </button>
+                            </form>
+                            {% endif %}
+                            <a href="{{ url_for('admin.order_detail', id=order.id) }}"
+                                class="text-salmon-600 hover:text-darkgray border border-gray-200 px-3 py-1 rounded bg-white">Ver
+                                detalle</a>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
@@ -98,4 +143,26 @@
         </table>
     </div>
 </div>
+
+{% if pagination.pages > 1 %}
+<div class="mt-6 flex items-center justify-between">
+    <p class="text-sm text-gray-500">
+        Página {{ pagination.page }} de {{ pagination.pages }}
+    </p>
+    <div class="flex items-center gap-2">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('admin.orders', page=pagination.prev_num, status=current_status, search=search, date_from=date_from, date_to=date_to) }}"
+            class="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+            Anterior
+        </a>
+        {% endif %}
+        {% if pagination.has_next %}
+        <a href="{{ url_for('admin.orders', page=pagination.next_num, status=current_status, search=search, date_from=date_from, date_to=date_to) }}"
+            class="rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+            Siguiente
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
 {% endblock %}

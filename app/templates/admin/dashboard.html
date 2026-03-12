@@ -22,6 +22,34 @@
     <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
         <div class="flex items-center justify-between">
             <div>
+                <p class="text-sm font-medium text-gray-500">Pedidos Esta Semana</p>
+                <p class="text-3xl font-bold text-darkgray mt-1">{{ orders_week }}</p>
+            </div>
+            <div class="bg-indigo-100 p-3 rounded-full">
+                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10m-13 9h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v11a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500">Pedidos Este Mes</p>
+                <p class="text-3xl font-bold text-darkgray mt-1">{{ orders_month }}</p>
+            </div>
+            <div class="bg-purple-100 p-3 rounded-full">
+                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 17v-6m4 6V7m4 10v-4M5 21h14"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between">
+            <div>
                 <p class="text-sm font-medium text-gray-500">Ingresos del Mes</p>
                 <p class="text-3xl font-bold text-darkgray mt-1">$ {{ "{:,.0f}".format(revenue_month).replace(',',
                     '.') }}</p>
@@ -35,6 +63,9 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
         <div class="flex items-center justify-between">
             <div>
@@ -64,6 +95,17 @@
                 </svg>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="bg-white shadow-sm rounded-lg border border-gray-100 overflow-hidden mb-8">
+    <div class="px-6 py-5 border-b border-gray-100">
+        <h3 class="text-lg font-medium leading-6 text-darkgray font-serif">Pedidos por Día</h3>
+        <p class="mt-1 text-sm text-gray-500">Últimos 30 días</p>
+    </div>
+    <div class="p-6">
+        <canvas id="orders-chart" height="110" data-labels='{{ chart_labels | tojson }}'
+            data-values='{{ chart_values | tojson }}'></canvas>
     </div>
 </div>
 
@@ -121,4 +163,10 @@
         </table>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/vendor/chart.umd.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}

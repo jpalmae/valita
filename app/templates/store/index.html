@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Inicio - Chocolates Patitas de Algodón{% endblock %}
+{% block page_id %}store-home{% endblock %}
 
 {% block content %}
 <!-- Navbar -->
@@ -110,10 +111,16 @@
                         <div class="mt-auto">
                             <span class="text-lg font-medium text-darkgray block mb-4">$ {{
                                 "{:,.0f}".format(p.price).replace(',', '.') }}</span>
-                            <a href="{{ url_for('main.product_detail', id=p.id) }}"
-                                class="inline-block bg-salmon-50 text-salmon-700 hover:bg-salmon-100 px-6 py-2 rounded-md text-sm font-medium transition-colors">
-                                Ver detalle
-                            </a>
+                            <div class="flex items-center justify-center gap-3">
+                                <button type="button" onclick="ValitaStore.addToCart({{ p.id }}, 1)"
+                                    class="inline-flex items-center bg-salmon-400 text-white hover:bg-salmon-500 px-5 py-2 rounded-md text-sm font-medium transition-colors">
+                                    Agregar al carrito
+                                </button>
+                                <a href="{{ url_for('main.product_detail', id=p.id) }}"
+                                    class="inline-block bg-salmon-50 text-salmon-700 hover:bg-salmon-100 px-5 py-2 rounded-md text-sm font-medium transition-colors">
+                                    Ver detalle
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -125,66 +132,10 @@
 </div>
 
 <!-- Footer -->
-<footer class="bg-white/60 relative z-10 backdrop-blur-md py-16 border-t border-white/40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-        <p class="font-serif text-3xl mb-6 text-[#4A2C22] tracking-widest">Chocolates Patitas de Algodón</p>
-        <div class="flex space-x-6 mb-8 text-sm font-medium text-[#7A5A4C]">
-            <a href="#" class="hover:text-[#A4573B] transition-colors">Inicio</a>
-            <a href="#" class="hover:text-[#A4573B] transition-colors">Contacto</a>
-            <a href="#" class="hover:text-[#A4573B] transition-colors">Instagram</a>
-            <a href="{{ url_for('admin.login') }}" class="hover:text-[#A4573B] transition-colors">Admin Panel</a>
-        </div>
-        <p class="text-sm text-[#9B7D6E]">© 2026 Chocolates Patitas de Algodón. Todos los derechos reservados.</p>
-    </div>
-</footer>
+{% include "store/_footer.html" %}
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const layers = document.querySelectorAll('.parallax-layer');
-        let scrollY = 0;
-        let mouseX = 0;
-        let mouseY = 0;
-        let ticking = false;
-
-        function updateParallax() {
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-
-            layers.forEach(layer => {
-                const speedX = parseFloat(layer.getAttribute('data-speed-x'));
-                const speedY = parseFloat(layer.getAttribute('data-speed-y'));
-
-                // Calculate movement based on scroll and mouse position
-                const x = (mouseX - centerX) * speedX;
-                const y = (mouseY - centerY) * speedY - (scrollY * speedY * 1.5);
-
-                layer.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-            });
-            ticking = false;
-        }
-
-        window.addEventListener('scroll', () => {
-            scrollY = window.scrollY;
-            if (!ticking) {
-                window.requestAnimationFrame(updateParallax);
-                ticking = true;
-            }
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            if (!ticking) {
-                window.requestAnimationFrame(updateParallax);
-                ticking = true;
-            }
-        });
-
-        // Initial call
-        updateParallax();
-    });
-</script>
+<script src="{{ url_for('static', filename='js/store.js') }}"></script>
 {% endblock %}

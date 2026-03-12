@@ -14,26 +14,43 @@ services:
       retries: 10
       timeout: 5s
 
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+      timeout: 3s
+
   app:
     build: ./app
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/chocolates_valita
       SECRET_KEY: ${SECRET_KEY}
       MP_ACCESS_TOKEN: ${MP_ACCESS_TOKEN}
       MP_PUBLIC_KEY: ${MP_PUBLIC_KEY}
+      RATELIMIT_STORAGE_URI: ${RATELIMIT_STORAGE_URI:-redis://redis:6379/0}
       BASE_URL: ${BASE_URL}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       FLASK_APP: run.py
     volumes:
       - ./app:/app
+      - uploads_data:/app/static/uploads
+      - ./app/static/uploads:/seed/uploads:ro
     expose:
       - "5000"
     command: >
-      sh -c "flask db upgrade && gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --reload run:app"
+      sh -c "mkdir -p /app/static/uploads &&
+      if [ -z \"$$(ls -A /app/static/uploads 2>/dev/null)\" ]; then cp -Rn /seed/uploads/. /app/static/uploads/ 2>/dev/null || true; fi &&
+      flask db upgrade &&
+      gunicorn --bind 0.0.0.0:5000 --workers 2 --timeout 120 --reload run:app"
 
   nginx:
     image: nginx:alpine
@@ -42,9 +59,14 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./app/static:/app/static:ro
+      - ./app/static/fonts:/app/static/fonts:ro
+      - ./app/static/img:/app/static/img:ro
+      - ./app/static/css:/app/static/css:ro
+      - ./app/static/js:/app/static/js:ro
+      - uploads_data:/app/static/uploads:ro
     depends_on:
       - app
 
 volumes:
   postgres_data:
+  uploads_data:

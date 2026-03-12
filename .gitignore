@@ -2,6 +2,7 @@
 .env
 __pycache__/
 *.pyc
+node_modules/
 
 # Local reference files not needed in the public repo
 Choco Chips.ttf

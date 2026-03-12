@@ -11,10 +11,14 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)
+    limiter._storage_uri = app.config.get('RATELIMIT_STORAGE_URI', 'memory://')
     limiter.init_app(app)
 
     # Import models
     import models
+
+    with app.app_context():
+        db.create_all()
 
     # Blueprints
     from routes.admin import admin_bp

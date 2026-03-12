@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'Choco Chips';
+    src: url('../fonts/choco-chips.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Choco Recipes';
+    src: url('../fonts/choco-recipes.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --site-font-family: 'Choco Chips', sans-serif;
+}
+
+html[data-site-font='choco-recipes'] {
+    --site-font-family: 'Choco Recipes', sans-serif;
+}
+
+body,
+.font-sans,
+.font-serif,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span,
+div,
+button,
+label,
+input,
+textarea,
+select {
+    font-family: var(--site-font-family) !important;
+}
+
+.site-font-toggle [data-font-choice] {
+    background: rgba(255, 247, 237, 0.18);
+    border: 1px solid rgba(255, 247, 237, 0.28);
+    color: #fff7ed;
+    transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.site-font-toggle [data-font-choice][aria-pressed='true'] {
+    background: #fff7ed;
+    border-color: #fff7ed;
+    color: #9d3d25;
+}
+
+.store-footer-card {
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(14px);
+}

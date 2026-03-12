@@ -34,7 +34,7 @@ def create_preference(order: Order) -> dict:
         "auto_return": "approved",
         "notification_url": f"{base_url}/mp/webhook",
         "external_reference": order.order_number,
-        "statement_descriptor": "Carol Chocolates",
+        "statement_descriptor": "PATITASALG",
     }
     
     result = sdk.preference().create(preference_data)
