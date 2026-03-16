@@ -17,10 +17,21 @@
 
     function updateCartBadge(cartCount) {
         const badge = document.getElementById('cart-badge');
+        const mobileBadges = document.querySelectorAll('[data-cart-badge-mobile]');
+
         if (badge) {
             badge.innerText = cartCount;
+        }
+
+        mobileBadges.forEach((mobileBadge) => {
+            mobileBadge.innerText = cartCount > 0 ? String(cartCount) : '';
+            mobileBadge.style.display = cartCount > 0 ? 'inline-flex' : 'none';
+        });
+
+        if (badge || mobileBadges.length) {
             return;
         }
+
         window.location.reload();
     }
 
