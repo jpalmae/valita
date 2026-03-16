@@ -113,7 +113,7 @@
                                 {{ history.new_status.value | replace('_', ' ') | title }}
                             </div>
                             <div class="text-xs text-gray-500">
-                                {{ history.created_at.strftime('%d/%m/%Y %H:%M') }}
+                                {{ format_datetime(history.created_at, '%d/%m/%Y %H:%M') }}
                                 {% if history.changed_by %}
                                 · {{ history.changed_by }}
                                 {% endif %}

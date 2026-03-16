@@ -20,6 +20,7 @@
 
 :root {
     --site-font-family: 'Choco Chips', sans-serif;
+    --admin-font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 html[data-site-font='choco-recipes'] {
@@ -63,4 +64,24 @@ select {
 .store-footer-card {
     background: rgba(255, 255, 255, 0.62);
     backdrop-filter: blur(14px);
+}
+
+body[data-page='admin'] .font-sans,
+body[data-page='admin'] .font-serif,
+body[data-page='admin'] a,
+body[data-page='admin'] button,
+body[data-page='admin'] div,
+body[data-page='admin'] h1,
+body[data-page='admin'] h2,
+body[data-page='admin'] h3,
+body[data-page='admin'] h4,
+body[data-page='admin'] h5,
+body[data-page='admin'] h6,
+body[data-page='admin'] input,
+body[data-page='admin'] label,
+body[data-page='admin'] p,
+body[data-page='admin'] select,
+body[data-page='admin'] span,
+body[data-page='admin'] textarea {
+    font-family: var(--admin-font-family) !important;
 }

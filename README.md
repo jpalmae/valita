@@ -31,7 +31,12 @@ DB_PASSWORD=supersecret
 SECRET_KEY=flask-secret-muy-larga-cambiar-en-prod
 MP_ACCESS_TOKEN=
 MP_PUBLIC_KEY=
+MP_WEBHOOK_SECRET=
 BASE_URL=http://localhost
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+RESEND_FROM_NAME=Chocolates Patitas de Algodón
+RESEND_REPLY_TO=admin@chocolatesvalita.cl
 ADMIN_EMAIL=admin@chocolatesvalita.cl
 ADMIN_PASSWORD=Admin1234!
 ```
@@ -76,6 +81,7 @@ http://localhost:8888/admin/login
 - Detalle de producto
 - Carrito
 - Checkout
+- Correo transaccional de confirmación vía Resend cuando el pago queda aprobado
 - Seguimiento de pedidos
 - Panel admin para:
   - crear productos

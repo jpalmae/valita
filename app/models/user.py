@@ -1,6 +1,6 @@
 from extensions import db, login_manager
 from flask_login import UserMixin
-from datetime import datetime, timezone
+from utils.datetime import utc_now
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -10,7 +10,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     is_admin = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=utc_now)
 
 @login_manager.user_loader
 def load_user(user_id):

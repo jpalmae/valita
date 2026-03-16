@@ -83,7 +83,7 @@
                         <div class="text-xs text-gray-500">{{ order.customer_email }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-500">{{ order.created_at.strftime('%d %b %Y %H:%M') }}</div>
+                        <div class="text-sm text-gray-500">{{ format_datetime(order.created_at, '%d %b %Y %H:%M') }}</div>
                         <div class="text-sm font-medium text-gray-900 mt-1">$ {{
                             "{:,.0f}".format(order.total).replace(',', '.') }}</div>
                     </td>

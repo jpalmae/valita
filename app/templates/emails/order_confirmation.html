@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Confirmación de pedido</title>
+</head>
+<body style="margin:0;padding:0;background:#fbf5ef;font-family:Arial,sans-serif;color:#3b241a;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fbf5ef;padding:24px 12px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#ffffff;border-radius:20px;overflow:hidden;">
+                    <tr>
+                        <td style="background:#f3b39f;padding:28px 32px;">
+                            <p style="margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#7a4b39;">Chocolates Patitas de Algodón</p>
+                            <h1 style="margin:12px 0 0;font-size:28px;line-height:1.2;">Tu pago fue aprobado</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:32px;">
+                            <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Hola {{ order.customer_name }}, recibimos tu pedido y ya quedó registrado en nuestro sistema.</p>
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:24px 0;background:#fff7f2;border:1px solid #f1ddd3;border-radius:14px;">
+                                <tr>
+                                    <td style="padding:20px;">
+                                        <p style="margin:0 0 8px;font-size:14px;color:#7a4b39;">Número de pedido</p>
+                                        <p style="margin:0 0 16px;font-size:20px;font-weight:bold;">{{ order.order_number }}</p>
+                                        <p style="margin:0 0 8px;font-size:14px;color:#7a4b39;">Total pagado</p>
+                                        <p style="margin:0;font-size:20px;font-weight:bold;">{{ format_currency(order.total) }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Puedes revisar el estado de tu pedido en cualquier momento desde este enlace:</p>
+                            <p style="margin:0 0 28px;">
+                                <a href="{{ tracking_url }}" style="display:inline-block;background:#a4573b;color:#ffffff;text-decoration:none;padding:14px 22px;border-radius:10px;font-weight:bold;">Ver seguimiento</a>
+                            </p>
+                            <p style="margin:0;font-size:14px;line-height:1.6;color:#6b4e43;">Si tienes dudas, responde este correo y te ayudaremos.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

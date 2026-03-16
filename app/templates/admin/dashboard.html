@@ -144,7 +144,7 @@
                         {{ order.customer_name }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ order.created_at.strftime('%d %b %H:%M') }}
+                        {{ format_datetime(order.created_at, '%d %b %H:%M') }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span
@@ -167,6 +167,6 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/vendor/chart.umd.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+<script src="{{ asset_url('js/vendor/chart.umd.min.js') }}"></script>
+<script src="{{ asset_url('js/admin.js') }}"></script>
 {% endblock %}

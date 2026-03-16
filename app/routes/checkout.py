@@ -3,8 +3,8 @@ from models.product import Product
 from models.order import Order, OrderStatus, OrderStatusHistory
 from models.order_item import OrderItem
 from extensions import db, limiter
-from utils.mercadopago import create_preference
-from datetime import datetime
+from utils.mercadopago import create_preference, get_payment_info, reconcile_order_from_payment_info
+from utils.datetime import local_now
 import random
 import string
 
@@ -104,9 +104,19 @@ def remove_from_cart():
     })
 
 def generate_order_number():
-    date_str = datetime.now().strftime('%Y%m%d')
+    date_str = local_now().strftime('%Y%m%d')
     random_str = ''.join(random.choices(string.ascii_uppercase + string.digits, k=4))
     return f"VAL-{date_str}-{random_str}"
+
+
+def _reconcile_payment_from_return():
+    payment_id = request.args.get('payment_id') or request.args.get('collection_id')
+    if not payment_id:
+        return None
+    payment_info = get_payment_info(payment_id)
+    if not payment_info:
+        return None
+    return reconcile_order_from_payment_info(payment_info)
 
 @checkout_bp.route('/checkout', methods=['GET', 'POST'])
 @limiter.limit("20 per hour", methods=["POST"])
@@ -178,13 +188,16 @@ def checkout():
 
 @checkout_bp.route('/pago/exito')
 def success():
+    order = _reconcile_payment_from_return()
     session.pop('cart', None)
-    return render_template('checkout/success.html')
+    return render_template('checkout/success.html', order=order)
 
 @checkout_bp.route('/pago/fallo')
 def failure():
-    return render_template('checkout/failure.html')
+    order = _reconcile_payment_from_return()
+    return render_template('checkout/failure.html', order=order)
 
 @checkout_bp.route('/pago/pendiente')
 def pending():
-    return render_template('checkout/pending.html')
+    order = _reconcile_payment_from_return()
+    return render_template('checkout/pending.html', order=order)

@@ -14,6 +14,12 @@ class Config:
     MP_WEBHOOK_SECRET = os.environ.get('MP_WEBHOOK_SECRET', '')
     
     BASE_URL = os.environ.get('BASE_URL', 'http://localhost')
+    APP_TIMEZONE = os.environ.get('APP_TIMEZONE', 'America/Santiago')
+
+    RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+    RESEND_FROM_EMAIL = os.environ.get('RESEND_FROM_EMAIL', '')
+    RESEND_FROM_NAME = os.environ.get('RESEND_FROM_NAME', 'Chocolates Patitas de Algodón')
+    RESEND_REPLY_TO = os.environ.get('RESEND_REPLY_TO', '')
     
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@chocolatesvalita.cl')
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Admin1234!')

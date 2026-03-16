@@ -1,5 +1,5 @@
 from extensions import db
-from datetime import datetime, timezone
+from utils.datetime import utc_now
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -13,5 +13,5 @@ class Product(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     category = db.Column(db.String(80), nullable=True)
     weight_grams = db.Column(db.Integer, nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=utc_now)
+    updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)

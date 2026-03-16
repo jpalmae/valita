@@ -1,10 +1,8 @@
 from flask import Blueprint, request, jsonify, current_app
-import mercadopago
 import hashlib
 import hmac
-from extensions import db
-from models.order import Order, OrderStatus
 from extensions import csrf, limiter
+from utils.mercadopago import get_payment_info, reconcile_order_from_payment_info
 
 payment_bp = Blueprint('payment', __name__)
 
@@ -64,28 +62,10 @@ def mercadopago_webhook():
         
     if data.get("type") == "payment":
         payment_id = data["data"]["id"]
-        access_token = current_app.config.get("MP_ACCESS_TOKEN")
-        
-        if not access_token:
+        payment_info = get_payment_info(payment_id)
+
+        if not payment_info:
             return jsonify({"status": "no token configured"}), 200
-            
-        sdk = mercadopago.SDK(access_token)
-        payment_info = sdk.payment().get(payment_id)["response"]
-        
-        order_number = payment_info.get("external_reference")
-        status = payment_info.get("status")  # approved, rejected, pending
-        
-        order = Order.query.filter_by(order_number=order_number).first()
-        if order:
-            order.mp_payment_id = str(payment_id)
-            order.payment_status = status
-            if status == "approved" and order.status == OrderStatus.RECIBIDO:
-                order.status = OrderStatus.RECIBIDO  # Admin confirma manualmente después
-            db.session.commit()
-        else:
-            current_app.logger.warning(
-                "MercadoPago payment received for unknown order.",
-                extra={"order_number": order_number, "payment_id": payment_id},
-            )
+        reconcile_order_from_payment_info(payment_info)
     
     return jsonify({"status": "ok"}), 200

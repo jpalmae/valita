@@ -10,7 +10,8 @@ import os
 import uuid
 from PIL import Image
 from sqlalchemy import func, or_
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
+from utils.datetime import local_now, local_date_range_utc, local_date_to_utc_start, to_local
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -72,15 +73,22 @@ def _append_order_status_history(order, new_status, note=None):
 def dashboard():
     from models.order import Order, OrderStatus
 
-    today = datetime.now().date()
+    today = local_now().date()
     start_week = today - timedelta(days=today.weekday())
-    orders_today = Order.query.filter(db.func.date(Order.created_at) == today).count()
-    orders_week = Order.query.filter(db.func.date(Order.created_at) >= start_week).count()
+    today_start_utc, today_end_utc = local_date_range_utc(today)
+    week_start_utc = local_date_to_utc_start(start_week)
+    month_start_utc = local_date_to_utc_start(today.replace(day=1))
+    tomorrow_start_utc = today_end_utc
 
-    first_day_month = today.replace(day=1)
-    orders_month = Order.query.filter(db.func.date(Order.created_at) >= first_day_month).count()
+    orders_today = Order.query.filter(
+        Order.created_at >= today_start_utc,
+        Order.created_at < today_end_utc,
+    ).count()
+    orders_week = Order.query.filter(Order.created_at >= week_start_utc).count()
+
+    orders_month = Order.query.filter(Order.created_at >= month_start_utc).count()
     revenue_month_result = db.session.query(func.sum(Order.total)).filter(
-        db.func.date(Order.created_at) >= first_day_month,
+        Order.created_at >= month_start_utc,
         Order.payment_status == 'approved'
     ).scalar()
     revenue_month = revenue_month_result or 0
@@ -89,17 +97,16 @@ def dashboard():
     manufacturing_orders = Order.query.filter_by(status=OrderStatus.EN_FABRICACION).count()
 
     chart_start = today - timedelta(days=29)
-    orders_per_day = (
-        db.session.query(
-            db.func.date(Order.created_at).label('created_day'),
-            func.count(Order.id).label('total_orders'),
-        )
-        .filter(db.func.date(Order.created_at) >= chart_start)
-        .group_by('created_day')
-        .order_by('created_day')
+    chart_start_utc = local_date_to_utc_start(chart_start)
+    recent_orders = (
+        Order.query
+        .filter(Order.created_at >= chart_start_utc, Order.created_at < tomorrow_start_utc)
         .all()
     )
-    counts_by_day = {created_day.isoformat(): total_orders for created_day, total_orders in orders_per_day}
+    counts_by_day = {}
+    for order in recent_orders:
+        local_day = to_local(order.created_at).date().isoformat()
+        counts_by_day[local_day] = counts_by_day.get(local_day, 0) + 1
     chart_labels = []
     chart_values = []
     for offset in range(30):
@@ -158,14 +165,16 @@ def orders():
         flash('La fecha inicial no es valida.', 'warning')
         return redirect(url_for('admin.orders'))
     if parsed_from:
-        query = query.filter(db.func.date(Order.created_at) >= parsed_from)
+        from_start_utc = local_date_to_utc_start(parsed_from)
+        query = query.filter(Order.created_at >= from_start_utc)
 
     parsed_to = _parse_date(date_to)
     if date_to and not parsed_to:
         flash('La fecha final no es valida.', 'warning')
         return redirect(url_for('admin.orders'))
     if parsed_to:
-        query = query.filter(db.func.date(Order.created_at) <= parsed_to)
+        _, to_end_utc = local_date_range_utc(parsed_to)
+        query = query.filter(Order.created_at < to_end_utc)
 
     pagination = query.order_by(Order.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
     return render_template(

@@ -1,6 +1,6 @@
 from extensions import db
 import enum
-from datetime import datetime, timezone
+from utils.datetime import utc_now
 
 class OrderStatus(enum.Enum):
     RECIBIDO = "recibido"
@@ -21,7 +21,7 @@ class OrderStatusHistory(db.Model):
     new_status = db.Column(db.Enum(OrderStatus), nullable=False)
     note = db.Column(db.Text, nullable=True)
     changed_by = db.Column(db.String(150), nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
 
 class Order(db.Model):
     __tablename__ = 'orders'
@@ -41,8 +41,8 @@ class Order(db.Model):
     payment_status = db.Column(db.String(50), default='pending') # pending, approved, rejected, cancelled
     mp_payment_id = db.Column(db.String(100), nullable=True)
     mp_preference_id = db.Column(db.String(150), nullable=True)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=utc_now)
+    updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
     admin_notes = db.Column(db.Text, nullable=True)
 
     items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')

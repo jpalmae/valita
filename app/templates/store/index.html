@@ -137,5 +137,5 @@
 
 {% block scripts %}
 {{ super() }}
-<script src="{{ url_for('static', filename='js/store.js') }}"></script>
+<script src="{{ asset_url('js/store.js') }}"></script>
 {% endblock %}
